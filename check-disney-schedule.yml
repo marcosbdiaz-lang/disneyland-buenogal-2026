@@ -1,0 +1,37 @@
+name: Comprobar horarios Disneyland
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Cada 2 horas. GitHub Actions usa UTC.
+    - cron: "17 */2 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: disneyland-schedule-check
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Comprobar horarios y actualizar Supabase
+        env:
+          SUPABASE_URL: https://upgwvszzndgabasrtuuc.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/check_disney_schedule.py

@@ -81,6 +81,17 @@ button{
 .dot{width:10px;height:10px;border-radius:50%;background:#9ca3af;display:inline-block}
 .dot.ok{background:#10b981}.dot.warn{background:#f59e0b}.dot.bad{background:#ef4444}
 .syncstatus{font-size:13px;color:var(--muted);flex:1}
+.statusmeta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 16px;
+  margin-top:6px;
+  padding-top:6px;
+  border-top:1px dashed var(--line);
+  font-size:12px;
+  color:var(--muted);
+}
+.statusmeta b{color:var(--ink)}
 .namebox{
   min-width:150px;max-width:220px;padding:8px 10px;border:1px solid var(--line);
   border-radius:10px;background:#fff
@@ -115,7 +126,11 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
   border:1px solid #fecaca;background:#fff;border-radius:12px;padding:11px 12px
 }
 .schedule-alert-card.cancelled{border-color:#ef4444;background:#fff1f2}
-.schedule-alert-card.unknown{border-color:#f59e0b;background:#fffbeb}
+.schedule-alert-card.unknown{
+  border-color:#f59e0b;
+  background:#fff8df;
+  box-shadow:0 0 0 3px rgba(245,158,11,.08)
+}
 .schedule-alert-card b{display:block;margin-bottom:3px}
 .schedule-alert-meta{font-size:13px;color:#7f1d1d}
 .schedule-alert-source{font-size:12px;margin-top:4px}
@@ -138,7 +153,41 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
   display:block;margin-top:6px;padding:7px 9px;border-radius:9px;
   background:#fee2e2;color:#991b1b;font-size:12px;font-weight:700
 }
-.inline-schedule-alert.unknown{background:#fef3c7;color:#92400e}
+.inline-schedule-alert.unknown{
+  background:#fef3c7;
+  color:#92400e;
+  border:1px solid #f59e0b;
+}
+.disney-confirm-banner{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:8px;
+  padding:10px 12px;
+  border-radius:11px;
+  border:2px solid #f59e0b;
+  background:#fff8df;
+  color:#92400e;
+  font-weight:800;
+}
+.disney-confirm-banner .mickey{
+  font-size:23px;
+  line-height:1;
+}
+.schedule-mickey-warning{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-left:7px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#fef3c7;
+  border:1px solid #f59e0b;
+  color:#92400e;
+  font-size:13px;
+  font-weight:900;
+  vertical-align:middle;
+}
 .new-arrival-time{
   display:block;margin-top:6px;color:#b91c1c;font-size:12px;font-weight:800
 }
@@ -172,6 +221,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
       <span class="badge">Embarazo</span>
       <span class="badge">Sin Extra Magic Time</span>
       <span class="badge">Checklist compartida</span>
+      <span class="badge"><b>Versión:</b> v3.1</span>
     </div>
   </div>
 </header>
@@ -181,6 +231,11 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <span id="syncDot" class="dot"></span>
     <div id="syncStatus" class="syncstatus">Preparando sincronización…</div>
     <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
+  </div>
+  <div class="wrap statusmeta">
+    <span>🧩 <b>v3.1</b></span>
+    <span>🔄 Última sincronización: <b id="lastSyncAt">—</b></span>
+    <span>🕒 Última comprobación de horarios: <b id="lastScheduleCheckAt">—</b></span>
   </div>
 </div>
 
@@ -393,6 +448,8 @@ const syncDot = document.getElementById('syncDot');
 const syncStatus = document.getElementById('syncStatus');
 const personName = document.getElementById('personName');
 const lastChange = document.getElementById('lastChange');
+const lastSyncAt = document.getElementById('lastSyncAt');
+const lastScheduleCheckAt = document.getElementById('lastScheduleCheckAt');
 
 personName.value = localStorage.getItem('disney_person_name') || '';
 personName.addEventListener('input', () => {
@@ -421,6 +478,25 @@ const scheduleMap = {
   tales_magic_2026_10_10:      {arrivalId:'s14', eventIdDom:'s15', lead:60},
   halloween_2026_10_11:        {arrivalId:'d6',  eventIdDom:'d7',  lead:30}
 };
+
+function formatDateTime(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleString('es-ES', {
+    day:'2-digit', month:'2-digit', year:'numeric',
+    hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+}
+
+function stampLastSync(){
+  const now = new Date();
+  lastSyncAt.textContent = formatDateTime(now);
+  localStorage.setItem('disney_last_sync_at', now.toISOString());
+}
+
+const savedLastSync = localStorage.getItem('disney_last_sync_at');
+if(savedLastSync) lastSyncAt.textContent = formatDateTime(savedLastSync);
 
 function configured(){
   return SUPABASE_URL.startsWith('https://') &&
@@ -475,6 +551,7 @@ function applyRemoteRow(row){
   localSave(box);
   suppressWrite = false;
   updateProgress();
+  stampLastSync();
   if(row.updated_at){
     const who = row.updated_by ? ` por ${row.updated_by}` : '';
     const d = new Date(row.updated_at);
@@ -509,7 +586,7 @@ function clearScheduleDecorations(){
       const item = input?.closest('.item');
       if(!item) return;
       item.classList.remove('schedule-changed');
-      item.querySelectorAll('.alert-badge,.inline-schedule-alert,.new-arrival-time')
+      item.querySelectorAll('.alert-badge,.schedule-mickey-warning,.inline-schedule-alert,.new-arrival-time')
         .forEach(el => el.remove());
     });
   });
@@ -531,18 +608,30 @@ function decorateScheduleRow(row){
   const eventItem = eventInput?.closest('.item');
   const arrivalItem = arrivalInput?.closest('.item');
 
-  const symbol = row.status === 'unknown' ? '⚠' : '!';
-  const cls = row.status === 'unknown' ? ' unknown' : '';
+  const isUnknown = row.status === 'unknown';
+  const symbol = isUnknown ? '⚠' : '!';
+  const cls = isUnknown ? ' unknown' : '';
 
   if(eventItem){
     eventItem.classList.add('schedule-changed');
     const strong = eventItem.querySelector('strong');
-    if(strong && !strong.querySelector('.alert-badge')){
-      const badge = document.createElement('span');
-      badge.className = 'alert-badge';
-      badge.textContent = symbol;
-      badge.title = 'Cambio de horario detectado';
-      strong.appendChild(badge);
+
+    if(isUnknown){
+      if(strong && !strong.querySelector('.schedule-mickey-warning')){
+        const badge = document.createElement('span');
+        badge.className = 'schedule-mickey-warning';
+        badge.textContent = '🐭 ⚠️';
+        badge.title = 'Confirmar con app oficial Disney';
+        strong.appendChild(badge);
+      }
+    } else {
+      if(strong && !strong.querySelector('.alert-badge')){
+        const badge = document.createElement('span');
+        badge.className = 'alert-badge';
+        badge.textContent = symbol;
+        badge.title = 'Cambio de horario detectado';
+        strong.appendChild(badge);
+      }
     }
 
     const info = document.createElement('span');
@@ -551,7 +640,13 @@ function decorateScheduleRow(row){
     if(row.status === 'cancelled'){
       info.textContent = `CANCELADO · horario previsto ${row.planned_time || '—'}`;
     } else if(row.status === 'unknown'){
-      info.textContent = row.message || 'Horario pendiente de confirmar. Revisa la app oficial.';
+      info.innerHTML = `
+        <span class="disney-confirm-banner">
+          <span class="mickey">🐭</span>
+          <span>⚠️ CONFIRMAR CON APP OFICIAL DISNEY<br>
+          <span style="font-weight:600">${escapeHtml(row.message || 'Horario dudoso o no confirmado por la fuente automática.')}</span></span>
+        </span>
+      `;
     } else {
       info.textContent =
         `CAMBIO: ${row.planned_time || '—'} → ${row.live_time || '—'}`
@@ -611,7 +706,7 @@ function renderScheduleAlerts(rows){
       if(row.status === 'cancelled'){
         detail = `Previsto: ${escapeHtml(row.planned_time || '—')} · CANCELADO`;
       } else if(row.status === 'unknown'){
-        detail = escapeHtml(row.message || 'Horario pendiente de confirmar.');
+        detail = `🐭 ⚠️ <b>CONFIRMAR CON APP OFICIAL DISNEY</b><br>${escapeHtml(row.message || 'La fuente automática no permite confirmar este horario con suficiente seguridad.')}`;
       } else {
         detail = `Previsto: ${escapeHtml(row.planned_time || '—')} → Nuevo: <b>${escapeHtml(row.live_time || '—')}</b>`;
       }
@@ -651,6 +746,19 @@ async function loadScheduleAlerts(){
   }
 
   renderScheduleAlerts(data || []);
+
+  const timestamps = (data || [])
+    .map(r => r.updated_at)
+    .filter(Boolean)
+    .map(v => new Date(v))
+    .filter(d => !Number.isNaN(d.getTime()));
+
+  if(timestamps.length){
+    const latest = new Date(Math.max(...timestamps.map(d => d.getTime())));
+    lastScheduleCheckAt.textContent = formatDateTime(latest);
+  } else {
+    lastScheduleCheckAt.textContent = 'Sin comprobaciones registradas';
+  }
 }
 
 async function saveRemote(box){
@@ -671,6 +779,7 @@ async function saveRemote(box){
     setStatus('bad', 'Error al sincronizar · guardado localmente');
     console.error(error);
   } else {
+    stampLastSync();
     setStatus('ok', 'Sincronizado en tiempo real');
   }
 }
@@ -696,6 +805,7 @@ async function reloadFromCloud(){
   (data || []).forEach(applyRemoteRow);
   suppressWrite = false;
   updateProgress();
+  stampLastSync();
   setStatus('ok', 'Sincronizado en tiempo real');
 }
 

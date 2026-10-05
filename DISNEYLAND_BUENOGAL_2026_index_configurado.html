@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b4bdb">
+<title>DISNEYLAND BUENOGAL 2026</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#1f2937; --muted:#667085;
+  --accent:#5b4bdb; --accent2:#ec4899; --line:#e7e9f0;
+  --good:#16936f; --warn:#b7791f; --bad:#c2410c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.45
+}
+header{
+  background:linear-gradient(135deg,#4338ca,#7c3aed 56%,#ec4899);
+  color:white;padding:28px 18px 24px
+}
+.wrap{max-width:1050px;margin:auto;padding:0 15px}
+h1{margin:0 0 7px;font-size:clamp(29px,5vw,48px);line-height:1}
+.subtitle{opacity:.95;font-size:15px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:6px 9px;border-radius:999px;font-size:12px}
+main{padding:17px 0 42px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 8px 30px rgba(36,38,60,.055);padding:17px;margin:13px 0
+}
+h2{margin:0 0 11px;font-size:23px}
+h3{margin:16px 0 8px;font-size:18px}
+.note,.warning,.success{
+  padding:11px 13px;border-radius:12px;margin:9px 0;font-size:14px
+}
+.note{background:#eef2ff;border-left:4px solid var(--accent)}
+.warning{background:#fff8e6;border-left:4px solid #d69e2e}
+.success{background:#eafaf4;border-left:4px solid var(--good)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.timeline{display:flex;flex-direction:column;gap:9px}
+.item{
+  display:grid;grid-template-columns:92px 1fr;gap:11px;align-items:start;
+  border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff
+}
+.time{font-weight:850;color:var(--accent);font-size:15px}
+.item strong{display:block;margin-bottom:3px}
+.small{font-size:13px;color:var(--muted)}
+.checkrow{display:flex;gap:10px;align-items:flex-start}
+.checkrow input[type="checkbox"]{
+  margin-top:3px;width:21px;height:21px;accent-color:var(--good);flex:0 0 auto
+}
+.checkrow label{cursor:pointer;flex:1}
+.day-fri{border-top:8px solid #4fb7e9}
+.day-sat{border-top:8px solid #8b5cf6}
+.day-sun{border-top:8px solid #f59e0b}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top}
+th{text-align:left;background:#fafbff}
+.priority{font-weight:800;color:var(--bad)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+button{
+  border:0;border-radius:10px;padding:9px 12px;font-weight:750;cursor:pointer
+}
+.primary{background:var(--accent);color:white}
+.secondary{background:#eceef6;color:#2d3748}
+.kpi{padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.kpi b{display:block;font-size:21px;color:var(--accent)}
+.syncbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 0
+}
+.syncrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:#9ca3af;display:inline-block}
+.dot.ok{background:#10b981}.dot.warn{background:#f59e0b}.dot.bad{background:#ef4444}
+.syncstatus{font-size:13px;color:var(--muted);flex:1}
+.namebox{
+  min-width:150px;max-width:220px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:10px;background:#fff
+}
+.progressbox{margin-top:12px}
+.progressline{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:5px}
+.progress{height:12px;border-radius:999px;background:#eceef6;overflow:hidden}
+.progress > span{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b4bdb,#ec4899);transition:width .25s}
+.sectionProgress{font-size:12px;color:var(--muted);margin:0 0 10px}
+.lastchange{font-size:12px;color:var(--muted);margin-top:5px}
+.footer{font-size:12px;color:var(--muted);padding:18px 0 38px}
+code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
+@media(max-width:560px){
+  .item{grid-template-columns:78px 1fr}
+  .time{font-size:14px}
+  .card{padding:14px}
+}
+@media print{
+  .syncbar,.toolbar{display:none}
+  body{background:white}
+  header{background:white!important;color:black;padding:10px 0}
+  .card{box-shadow:none;break-inside:avoid;border-color:#ccc}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <h1>DISNEYLAND BUENOGAL 2026</h1>
+    <div class="subtitle">9–11 octubre · Planning familiar sincronizado en tiempo real</div>
+    <div class="badges">
+      <span class="badge">Carrito</span>
+      <span class="badge">Niña 34 meses</span>
+      <span class="badge">Embarazo</span>
+      <span class="badge">Sin Extra Magic Time</span>
+      <span class="badge">Checklist compartida</span>
+    </div>
+  </div>
+</header>
+
+<div class="syncbar">
+  <div class="wrap syncrow">
+    <span id="syncDot" class="dot"></span>
+    <div id="syncStatus" class="syncstatus">Preparando sincronización…</div>
+    <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="card">
+  <h2>Progreso del viaje</h2>
+  <div class="progressbox">
+    <div class="progressline"><span>Total completado</span><b id="progressText">0 / 0 · 0%</b></div>
+    <div class="progress"><span id="progressBar"></span></div>
+  </div>
+  <div class="grid" style="margin-top:12px">
+    <div class="kpi"><b id="friProgress">0%</b>Viernes · Adventure World</div>
+    <div class="kpi"><b id="satProgress">0%</b>Sábado · Disneyland Park</div>
+    <div class="kpi"><b id="sunProgress">0%</b>Domingo · día colchón</div>
+    <div class="kpi"><b id="prepProgress">0%</b>Preparación / reglas</div>
+  </div>
+  <div id="lastChange" class="lastchange">Todavía no hay cambios sincronizados.</div>
+  <div class="toolbar">
+    <button class="primary" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    <button class="secondary" onclick="reloadFromCloud()">Recargar desde Supabase</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Resumen rápido de horas clave</h2>
+  <div class="grid">
+    <div class="kpi"><b>08:40</b>Vie · entrada Adventure World</div>
+    <div class="kpi"><b>12:05</b>Vie · Arendelle Bay</div>
+    <div class="kpi"><b>13:30</b>Vie · Princess Cavalcade</div>
+    <div class="kpi"><b>21:00</b>Vie · sitio para Cascade</div>
+    <div class="kpi"><b>10:55</b>Sáb · Stars on Parade</div>
+    <div class="kpi"><b>14:45</b>Sáb · Halloween</div>
+    <div class="kpi"><b>21:00</b>Sáb · sitio para Tales of Magic</div>
+    <div class="kpi"><b>16:30</b>Dom · Halloween Plan B</div>
+  </div>
+  <div class="note"><b>Regla:</b> las horas de “estar allí” son más importantes que las horas de comienzo. La app oficial manda si Disney cambia un pase.</div>
+</section>
+
+<section class="card">
+  <h2>Checklist antes de salir</h2>
+  <div class="sectionProgress" id="prepSectionProgress"></div>
+  <div class="grid">
+    <div>
+      <div class="checkrow"><input data-group="prep" id="pre1" type="checkbox"><label for="pre1">Entradas cargadas en la app Disneyland Paris.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre2" type="checkbox"><label for="pre2">Batería externa + cable.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre3" type="checkbox"><label for="pre3">Carrito + plástico de lluvia.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre4" type="checkbox"><label for="pre4">Ropa de abrigo / manta ligera para la peque.</label></div>
+    </div>
+    <div>
+      <div class="checkrow"><input data-group="prep" id="pre5" type="checkbox"><label for="pre5">DNI / documentación.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre6" type="checkbox"><label for="pre6">Certificado de embarazo para solicitar la pulsera.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre7" type="checkbox"><label for="pre7">Agua + snack rápido para la niña.</label></div>
+      <div class="checkrow"><input data-group="prep" id="pre8" type="checkbox"><label for="pre8">Revisar horarios de espectáculos esa mañana en la app.</label></div>
+    </div>
+  </div>
+  <div class="warning"><b>Frozen Ever After:</b> el orden del planning es el que habéis decidido: entrada → World of Frozen → Frozen Ever After → pulsera después. Disneyland Paris marca restricciones/recomendaciones específicas para embarazo; seguid las indicaciones vigentes del Cast Member en el acceso.</div>
+</section>
+
+<section class="card day-fri">
+  <h2>Viernes 9 · Disney Adventure World</h2>
+  <div class="sectionProgress" id="friSectionProgress"></div>
+  <div class="success"><b>Objetivo:</b> Frozen a primera hora, Arendelle completo, espectáculos fuertes por la tarde y cierre con Cascade of Lights.</div>
+  <div class="timeline">
+    <div class="item"><div class="time">08:40</div><div class="checkrow"><input data-group="fri" id="f1" type="checkbox"><label for="f1"><strong>Estar en la entrada</strong><span class="small">Sin Extra Magic Time. Llegar con margen.</span></label></div></div>
+    <div class="item"><div class="time">09:30</div><div class="checkrow"><input data-group="fri" id="f2" type="checkbox"><label for="f2"><strong>Entrar + mirar Fila Virtual de Anna y Elsa</strong><span class="small">Comprobar disponibilidad nada más escanear.</span></label></div></div>
+    <div class="item"><div class="time">09:32</div><div class="checkrow"><input data-group="fri" id="f3" type="checkbox"><label for="f3"><strong>Directos a World of Frozen</strong><span class="small">Sin tiendas ni fotos todavía.</span></label></div></div>
+    <div class="item"><div class="time">≈09:40</div><div class="checkrow"><input data-group="fri" id="f4" type="checkbox"><label for="f4"><strong>Frozen Ever After</strong><span class="small">Primera prioridad. Después, pulsera.</span></label></div></div>
+    <div class="item"><div class="time">10:15</div><div class="checkrow"><input data-group="fri" id="f5" type="checkbox"><label for="f5"><strong>Solicitar pulsera de embarazo</strong><span class="small">Uno puede quedarse con la peque en Arendelle.</span></label></div></div>
+    <div class="item"><div class="time">10:15–11:10</div><div class="checkrow"><input data-group="fri" id="f6" type="checkbox"><label for="f6"><strong>Arendelle tranquila</strong><span class="small">Fotos, tiendas, paseo y adaptar Anna/Elsa.</span></label></div></div>
+    <div class="item"><div class="time">11:20</div><div class="checkrow"><input data-group="fri" id="f7" type="checkbox"><label for="f7"><strong>Nordic Crowns Tavern ⭐</strong><span class="small">Comida temprana dentro de Frozen.</span></label></div></div>
+    <div class="item"><div class="time">12:05</div><div class="checkrow"><input data-group="fri" id="f8" type="checkbox"><label for="f8"><strong>ESTAR en Arendelle Bay</strong><span class="small">Para A Celebration in Arendelle.</span></label></div></div>
+    <div class="item"><div class="time">12:20–12:40</div><div class="checkrow"><input data-group="fri" id="f9" type="checkbox"><label for="f9"><strong>A Celebration in Arendelle</strong><span class="small">Anna, Elsa, Olaf y Kristoff.</span></label></div></div>
+    <div class="item"><div class="time">12:40–13:20</div><div class="checkrow"><input data-group="fri" id="f10" type="checkbox"><label for="f10"><strong>Anna/Elsa / último bloque Arendelle</strong><span class="small">Priorizar Fila Virtual si cae aquí.</span></label></div></div>
+    <div class="item"><div class="time">13:30</div><div class="checkrow"><input data-group="fri" id="f11" type="checkbox"><label for="f11"><strong>ESTAR en Adventure Bay</strong><span class="small">20 min de margen con carrito.</span></label></div></div>
+    <div class="item"><div class="time">13:50</div><div class="checkrow"><input data-group="fri" id="f12" type="checkbox"><label for="f12"><strong>Disney Princess Cavalcade</strong><span class="small">Gran prioridad para la peque.</span></label></div></div>
+    <div class="item"><div class="time">14:35</div><div class="checkrow"><input data-group="fri" id="f13" type="checkbox"><label for="f13"><strong>ESTAR en Mickey and the Magician</strong><span class="small">Entrar con tiempo.</span></label></div></div>
+    <div class="item"><div class="time">15:10–15:40</div><div class="checkrow"><input data-group="fri" id="f14" type="checkbox"><label for="f14"><strong>Mickey and the Magician</strong><span class="small">Descanso sentado.</span></label></div></div>
+    <div class="item"><div class="time">16:20</div><div class="checkrow"><input data-group="fri" id="f15" type="checkbox"><label for="f15"><strong>ESTAR en Studio Theater</strong><span class="small">Para TOGETHER.</span></label></div></div>
+    <div class="item"><div class="time">16:50–17:20</div><div class="checkrow"><input data-group="fri" id="f16" type="checkbox"><label for="f16"><strong>TOGETHER: a Pixar Musical Adventure</strong><span class="small">Toy Story, Monstruos S.A., Nemo…</span></label></div></div>
+    <div class="item"><div class="time">17:30–18:15</div><div class="checkrow"><input data-group="fri" id="f17" type="checkbox"><label for="f17"><strong>Stark Factory ⭐</strong><span class="small">Cena temprana.</span></label></div></div>
+    <div class="item"><div class="time">18:15–20:45</div><div class="checkrow"><input data-group="fri" id="f18" type="checkbox"><label for="f18"><strong>Bloque flexible Pixar / Marvel</strong><span class="small">Decidir por colas y energía.</span></label></div></div>
+    <div class="item"><div class="time">20:45</div><div class="checkrow"><input data-group="fri" id="f19" type="checkbox"><label for="f19"><strong>Baño + abrigo + preparar carrito</strong></label></div></div>
+    <div class="item"><div class="time">21:00</div><div class="checkrow"><input data-group="fri" id="f20" type="checkbox"><label for="f20"><strong>ESTAR colocados para Cascade of Lights</strong><span class="small">Preguntar por ubicación/acceso con pulsera.</span></label></div></div>
+    <div class="item"><div class="time">≈21:50</div><div class="checkrow"><input data-group="fri" id="f21" type="checkbox"><label for="f21"><strong>Disney Cascade of Lights</strong></label></div></div>
+  </div>
+</section>
+
+<section class="card day-sat">
+  <h2>Sábado 10 · Disneyland Park</h2>
+  <div class="sectionProgress" id="satSectionProgress"></div>
+  <div class="success"><b>Objetivo:</b> Fantasyland temprano + Stars on Parade + Rey León + Halloween + Cowboy Cookout + Tales of Magic.</div>
+  <div class="timeline">
+    <div class="item"><div class="time">08:10</div><div class="checkrow"><input data-group="sat" id="s1" type="checkbox"><label for="s1"><strong>Estar en la entrada</strong><span class="small">Día previsiblemente más fuerte.</span></label></div></div>
+    <div class="item"><div class="time">09:00–10:40</div><div class="checkrow"><input data-group="sat" id="s2" type="checkbox"><label for="s2"><strong>Fantasyland</strong><span class="small">Priorizar atracciones infantiles.</span></label></div></div>
+    <div class="item"><div class="time">10:55</div><div class="checkrow"><input data-group="sat" id="s3" type="checkbox"><label for="s3"><strong>ESTAR para Disney Stars on Parade</strong><span class="small">Zona “it's a small world”.</span></label></div></div>
+    <div class="item"><div class="time">11:30</div><div class="checkrow"><input data-group="sat" id="s4" type="checkbox"><label for="s4"><strong>Disney Stars on Parade</strong></label></div></div>
+    <div class="item"><div class="time">12:10–12:45</div><div class="checkrow"><input data-group="sat" id="s5" type="checkbox"><label for="s5"><strong>Toad Hall Restaurant ⭐</strong></label></div></div>
+    <div class="item"><div class="time">13:00</div><div class="checkrow"><input data-group="sat" id="s6" type="checkbox"><label for="s6"><strong>ESTAR en Frontierland Theater</strong></label></div></div>
+    <div class="item"><div class="time">13:30–14:00</div><div class="checkrow"><input data-group="sat" id="s7" type="checkbox"><label for="s7"><strong>The Lion King: Rhythms of the Pride Lands</strong></label></div></div>
+    <div class="item"><div class="time">14:45</div><div class="checkrow"><input data-group="sat" id="s8" type="checkbox"><label for="s8"><strong>ESTAR en Central Plaza / Castillo</strong></label></div></div>
+    <div class="item"><div class="time">15:25–15:50</div><div class="checkrow"><input data-group="sat" id="s9" type="checkbox"><label for="s9"><strong>Mickey's Halloween Celebration</strong></label></div></div>
+    <div class="item"><div class="time">16:00–17:15</div><div class="checkrow"><input data-group="sat" id="s10" type="checkbox"><label for="s10"><strong>Bloque flexible</strong><span class="small">Personajes / Fantasyland / Adventureland.</span></label></div></div>
+    <div class="item"><div class="time">17:20–18:05</div><div class="checkrow"><input data-group="sat" id="s11" type="checkbox"><label for="s11"><strong>Cowboy Cookout Barbecue ⭐</strong></label></div></div>
+    <div class="item"><div class="time">18:05–20:30</div><div class="checkrow"><input data-group="sat" id="s12" type="checkbox"><label for="s12"><strong>Parque relajado</strong><span class="small">Favoritos / compras / baja cola.</span></label></div></div>
+    <div class="item"><div class="time">20:30</div><div class="checkrow"><input data-group="sat" id="s13" type="checkbox"><label for="s13"><strong>Snack + baño + abrigo</strong></label></div></div>
+    <div class="item"><div class="time">21:00</div><div class="checkrow"><input data-group="sat" id="s14" type="checkbox"><label for="s14"><strong>ESTAR en zona Castillo / Main Street</strong></label></div></div>
+    <div class="item"><div class="time">≈22:00</div><div class="checkrow"><input data-group="sat" id="s15" type="checkbox"><label for="s15"><strong>Disney Tales of Magic</strong></label></div></div>
+  </div>
+</section>
+
+<section class="card day-sun">
+  <h2>Domingo 11 · Día colchón</h2>
+  <div class="sectionProgress" id="sunSectionProgress"></div>
+  <div class="success"><b>Objetivo:</b> recuperar pendientes, repetir favoritos y no forzar un tercer maratón.</div>
+  <div class="timeline">
+    <div class="item"><div class="time">08:30</div><div class="checkrow"><input data-group="sun" id="d1" type="checkbox"><label for="d1"><strong>Llegar al parque</strong></label></div></div>
+    <div class="item"><div class="time">09:00–11:15</div><div class="checkrow"><input data-group="sun" id="d2" type="checkbox"><label for="d2"><strong>Favoritos + personaje pendiente</strong></label></div></div>
+    <div class="item"><div class="time">11:30–12:10</div><div class="checkrow"><input data-group="sun" id="d3" type="checkbox"><label for="d3"><strong>Pizzeria Bella Notte ⭐</strong></label></div></div>
+    <div class="item"><div class="time">12:15–14:30</div><div class="checkrow"><input data-group="sun" id="d4" type="checkbox"><label for="d4"><strong>Fantasyland / Adventureland / personajes</strong></label></div></div>
+    <div class="item"><div class="time">14:30–16:00</div><div class="checkrow"><input data-group="sun" id="d5" type="checkbox"><label for="d5"><strong>Siesta / descanso protegido</strong></label></div></div>
+    <div class="item"><div class="time">16:30</div><div class="checkrow"><input data-group="sun" id="d6" type="checkbox"><label for="d6"><strong>PLAN B · estar para Halloween</strong><span class="small">Solo si hace falta recuperar/repetir.</span></label></div></div>
+    <div class="item"><div class="time">17:00</div><div class="checkrow"><input data-group="sun" id="d7" type="checkbox"><label for="d7"><strong>Mickey's Halloween Celebration · Plan B</strong></label></div></div>
+    <div class="item"><div class="time">17:30+</div><div class="checkrow"><input data-group="sun" id="d8" type="checkbox"><label for="d8"><strong>Favoritos / compras / fotos</strong></label></div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Restaurantes objetivo</h2>
+  <table>
+    <thead><tr><th>Restaurante</th><th>Día</th><th>Hora</th><th>✓</th></tr></thead>
+    <tbody>
+      <tr><td>Nordic Crowns Tavern</td><td>Vie</td><td>11:20</td><td><input data-group="prep" id="r1" type="checkbox"></td></tr>
+      <tr><td>Stark Factory</td><td>Vie</td><td>17:30</td><td><input data-group="prep" id="r2" type="checkbox"></td></tr>
+      <tr><td>Toad Hall Restaurant</td><td>Sáb</td><td>12:10</td><td><input data-group="prep" id="r3" type="checkbox"></td></tr>
+      <tr><td>Cowboy Cookout Barbecue</td><td>Sáb</td><td>17:20</td><td><input data-group="prep" id="r4" type="checkbox"></td></tr>
+      <tr><td>Pizzeria Bella Notte</td><td>Dom</td><td>11:30</td><td><input data-group="prep" id="r5" type="checkbox"></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Resumen: hora de estar allí</h2>
+  <table>
+    <thead><tr><th>Día</th><th>Evento</th><th>Empieza</th><th class="priority">Estar allí</th></tr></thead>
+    <tbody>
+      <tr><td>Vie 9</td><td>A Celebration in Arendelle</td><td>12:20</td><td class="priority">12:05</td></tr>
+      <tr><td>Vie 9</td><td>Disney Princess Cavalcade</td><td>13:50</td><td class="priority">13:30</td></tr>
+      <tr><td>Vie 9</td><td>Mickey and the Magician</td><td>15:10</td><td class="priority">14:35</td></tr>
+      <tr><td>Vie 9</td><td>TOGETHER</td><td>16:50</td><td class="priority">16:20</td></tr>
+      <tr><td>Vie 9</td><td>Disney Cascade of Lights</td><td>≈21:50</td><td class="priority">21:00</td></tr>
+      <tr><td>Sáb 10</td><td>Disney Stars on Parade</td><td>11:30</td><td class="priority">10:55</td></tr>
+      <tr><td>Sáb 10</td><td>The Lion King</td><td>13:30</td><td class="priority">13:00</td></tr>
+      <tr><td>Sáb 10</td><td>Mickey's Halloween Celebration</td><td>15:25</td><td class="priority">14:45</td></tr>
+      <tr><td>Sáb 10</td><td>Disney Tales of Magic</td><td>≈22:00</td><td class="priority">21:00</td></tr>
+      <tr><td>Dom 11</td><td>Halloween · Plan B</td><td>17:00</td><td class="priority">16:30</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Reglas para no perder tiempo</h2>
+  <div class="grid">
+    <div>
+      <div class="checkrow"><input data-group="prep" id="rule1" type="checkbox"><label for="rule1"><b>No cruzar el parque por una sola atracción.</b> Agrupar por zonas.</label></div>
+      <div class="checkrow"><input data-group="prep" id="rule2" type="checkbox"><label for="rule2"><b>Comer temprano.</b> Menos cola.</label></div>
+      <div class="checkrow"><input data-group="prep" id="rule3" type="checkbox"><label for="rule3"><b>Mirar la app al entrar.</b> Filas Virtuales y cambios primero.</label></div>
+    </div>
+    <div>
+      <div class="checkrow"><input data-group="prep" id="rule4" type="checkbox"><label for="rule4"><b>Con carrito, llegar antes a desfiles.</b></label></div>
+      <div class="checkrow"><input data-group="prep" id="rule5" type="checkbox"><label for="rule5"><b>Domingo = colchón.</b> No llenar huecos por llenar.</label></div>
+      <div class="checkrow"><input data-group="prep" id="rule6" type="checkbox"><label for="rule6"><b>Si Disney cambia un horario, manda la app.</b></label></div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  DISNEYLAND BUENOGAL 2026 · Checklist compartida. La sincronización usa Supabase Realtime. No guardéis información sensible en esta página.
+</div>
+
+</main>
+
+<script>
+/* ==========================================================
+   CONFIGURACIÓN SUPABASE
+   PASO 1: pega aquí Project URL
+   PASO 2: pega aquí Publishable key (o anon key legacy)
+   ========================================================== */
+const SUPABASE_URL = "https://upgwvszzndgabasrtuuc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HfVjhcZtFkNqFn0-mgIjJA_JhyQVohB";
+
+/* No hace falta cambiar esto */
+const TRIP_ID = "disneyland-buenogal-2026";
+const TABLE = "disney_checklist";
+
+const boxes = [...document.querySelectorAll('input[type="checkbox"]')];
+const syncDot = document.getElementById('syncDot');
+const syncStatus = document.getElementById('syncStatus');
+const personName = document.getElementById('personName');
+const lastChange = document.getElementById('lastChange');
+
+personName.value = localStorage.getItem('disney_person_name') || '';
+personName.addEventListener('input', () => {
+  localStorage.setItem('disney_person_name', personName.value.trim());
+});
+
+let sb = null;
+let realtimeChannel = null;
+let suppressWrite = false;
+
+function configured(){
+  return SUPABASE_URL.startsWith('https://') &&
+         !SUPABASE_URL.includes('PEGA_AQUI') &&
+         SUPABASE_KEY.length > 20 &&
+         !SUPABASE_KEY.includes('PEGA_AQUI');
+}
+
+function setStatus(kind, text){
+  syncDot.className = 'dot ' + (kind || '');
+  syncStatus.textContent = text;
+}
+
+function localSave(box){
+  localStorage.setItem('disney_local_' + box.id, box.checked ? '1':'0');
+}
+
+function localLoad(){
+  boxes.forEach(box => {
+    const v = localStorage.getItem('disney_local_' + box.id);
+    if(v !== null) box.checked = v === '1';
+  });
+}
+
+function updateProgress(){
+  const total = boxes.length;
+  const done = boxes.filter(b => b.checked).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progressText').textContent = `${done} / ${total} · ${pct}%`;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  const groups = {
+    fri: ['friProgress','friSectionProgress'],
+    sat: ['satProgress','satSectionProgress'],
+    sun: ['sunProgress','sunSectionProgress'],
+    prep:['prepProgress','prepSectionProgress']
+  };
+  Object.entries(groups).forEach(([group, ids]) => {
+    const groupBoxes = boxes.filter(b => b.dataset.group === group);
+    const groupDone = groupBoxes.filter(b => b.checked).length;
+    const gpct = groupBoxes.length ? Math.round(groupDone/groupBoxes.length*100) : 0;
+    document.getElementById(ids[0]).textContent = gpct + '%';
+    document.getElementById(ids[1]).textContent = `${groupDone} de ${groupBoxes.length} completados · ${gpct}%`;
+  });
+}
+
+function applyRemoteRow(row){
+  const box = document.getElementById(row.item_id);
+  if(!box) return;
+  suppressWrite = true;
+  box.checked = !!row.checked;
+  localSave(box);
+  suppressWrite = false;
+  updateProgress();
+  if(row.updated_at){
+    const who = row.updated_by ? ` por ${row.updated_by}` : '';
+    const d = new Date(row.updated_at);
+    lastChange.textContent = `Último cambio${who}: ${d.toLocaleString('es-ES')}`;
+  }
+}
+
+async function saveRemote(box){
+  if(!sb) return;
+  const who = personName.value.trim() || 'Dispositivo';
+  const payload = {
+    trip_id: TRIP_ID,
+    item_id: box.id,
+    checked: box.checked,
+    updated_by: who,
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await sb
+    .from(TABLE)
+    .upsert(payload, { onConflict: 'trip_id,item_id' });
+
+  if(error){
+    setStatus('bad', 'Error al sincronizar · guardado localmente');
+    console.error(error);
+  } else {
+    setStatus('ok', 'Sincronizado en tiempo real');
+  }
+}
+
+async function reloadFromCloud(){
+  if(!sb){
+    alert('Primero configura Supabase en el HTML.');
+    return;
+  }
+  setStatus('warn', 'Cargando desde Supabase…');
+  const { data, error } = await sb
+    .from(TABLE)
+    .select('item_id,checked,updated_by,updated_at')
+    .eq('trip_id', TRIP_ID);
+
+  if(error){
+    setStatus('bad', 'No se pudo cargar Supabase');
+    console.error(error);
+    return;
+  }
+
+  suppressWrite = true;
+  (data || []).forEach(applyRemoteRow);
+  suppressWrite = false;
+  updateProgress();
+  setStatus('ok', 'Sincronizado en tiempo real');
+}
+
+async function initSupabase(){
+  localLoad();
+  updateProgress();
+
+  if(!configured()){
+    setStatus('warn', 'Falta configurar Project URL y Publishable key de Supabase');
+    return;
+  }
+
+  try{
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    await reloadFromCloud();
+
+    realtimeChannel = sb
+      .channel('disneyland-buenogal-2026-live')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: TABLE,
+          filter: `trip_id=eq.${TRIP_ID}`
+        },
+        payload => {
+          if(payload.new) applyRemoteRow(payload.new);
+        }
+      )
+      .subscribe(status => {
+        if(status === 'SUBSCRIBED') setStatus('ok', 'Sincronizado en tiempo real');
+        else if(status === 'CHANNEL_ERROR') setStatus('bad', 'Error en Realtime');
+        else if(status === 'TIMED_OUT') setStatus('bad', 'Realtime sin respuesta');
+      });
+
+  } catch(err){
+    console.error(err);
+    setStatus('bad', 'No se pudo iniciar Supabase');
+  }
+}
+
+boxes.forEach(box => {
+  box.addEventListener('change', async () => {
+    if(suppressWrite) return;
+    localSave(box);
+    updateProgress();
+    await saveRemote(box);
+  });
+});
+
+window.addEventListener('online', () => {
+  if(sb) reloadFromCloud();
+});
+window.addEventListener('offline', () => {
+  setStatus('warn', 'Sin internet · cambios guardados localmente');
+});
+
+initSupabase();
+</script>
+</body>
+</html>

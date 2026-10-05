@@ -93,6 +93,60 @@ button{
 .lastchange{font-size:12px;color:var(--muted);margin-top:5px}
 .footer{font-size:12px;color:var(--muted);padding:18px 0 38px}
 code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
+
+/* Alertas automáticas de cambios de horario */
+.schedule-alert-panel{
+  display:none;
+  border:2px solid #ef4444;
+  background:#fff7f7;
+  box-shadow:0 10px 34px rgba(239,68,68,.10)
+}
+.schedule-alert-panel.active{display:block}
+.schedule-alert-title{
+  display:flex;align-items:center;gap:9px;margin-bottom:9px
+}
+.schedule-alert-title .bang{
+  width:32px;height:32px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#ef4444;color:#fff;font-weight:900;font-size:20px
+}
+.schedule-alert-list{display:flex;flex-direction:column;gap:9px}
+.schedule-alert-card{
+  border:1px solid #fecaca;background:#fff;border-radius:12px;padding:11px 12px
+}
+.schedule-alert-card.cancelled{border-color:#ef4444;background:#fff1f2}
+.schedule-alert-card.unknown{border-color:#f59e0b;background:#fffbeb}
+.schedule-alert-card b{display:block;margin-bottom:3px}
+.schedule-alert-meta{font-size:13px;color:#7f1d1d}
+.schedule-alert-source{font-size:12px;margin-top:4px}
+.schedule-ok{
+  display:flex;gap:8px;align-items:center;font-size:13px;color:var(--good);margin-top:8px
+}
+.item.schedule-changed{
+  border:2px solid #ef4444;
+  background:#fff8f8;
+  box-shadow:0 0 0 3px rgba(239,68,68,.06)
+}
+.alert-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:25px;height:25px;border-radius:50%;
+  background:#ef4444;color:#fff;font-weight:900;font-size:17px;
+  margin-left:7px;vertical-align:middle;
+  animation:pulseAlert 1.5s infinite
+}
+.inline-schedule-alert{
+  display:block;margin-top:6px;padding:7px 9px;border-radius:9px;
+  background:#fee2e2;color:#991b1b;font-size:12px;font-weight:700
+}
+.inline-schedule-alert.unknown{background:#fef3c7;color:#92400e}
+.new-arrival-time{
+  display:block;margin-top:6px;color:#b91c1c;font-size:12px;font-weight:800
+}
+@keyframes pulseAlert{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.12)}
+}
+
 @media(max-width:560px){
   .item{grid-template-columns:78px 1fr}
   .time{font-size:14px}
@@ -132,6 +186,17 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
 
 <main class="wrap">
 
+<section id="scheduleAlertPanel" class="card schedule-alert-panel" aria-live="polite">
+  <div class="schedule-alert-title">
+    <span class="bang">!</span>
+    <div>
+      <h2 style="margin:0">Cambios de horario detectados</h2>
+      <div class="small">Revisa estos cambios antes de seguir el planning.</div>
+    </div>
+  </div>
+  <div id="scheduleAlertList" class="schedule-alert-list"></div>
+</section>
+
 <section class="card">
   <h2>Progreso del viaje</h2>
   <div class="progressbox">
@@ -164,6 +229,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <div class="kpi"><b>16:30</b>Dom · Halloween Plan B</div>
   </div>
   <div class="note"><b>Regla:</b> las horas de “estar allí” son más importantes que las horas de comienzo. La app oficial manda si Disney cambia un pase.</div>
+  <div id="scheduleOkLine" class="schedule-ok">✅ Sin cambios de horario detectados en Supabase.</div>
 </section>
 
 <section class="card">
@@ -335,7 +401,26 @@ personName.addEventListener('input', () => {
 
 let sb = null;
 let realtimeChannel = null;
+let scheduleChannel = null;
 let suppressWrite = false;
+
+/* Relación entre cada evento vigilado y sus filas del planning.
+   arrivalId = fila "ESTAR..."
+   eventIdDom = fila del espectáculo/desfile
+   lead = minutos de margen recomendados antes del inicio.
+*/
+const scheduleMap = {
+  arendelle_2026_10_09:        {arrivalId:'f8',  eventIdDom:'f9',  lead:15},
+  princess_cavalcade_2026_10_09:{arrivalId:'f11', eventIdDom:'f12', lead:20},
+  mickey_magician_2026_10_09:  {arrivalId:'f13', eventIdDom:'f14', lead:35},
+  together_2026_10_09:         {arrivalId:'f15', eventIdDom:'f16', lead:30},
+  cascade_2026_10_09:          {arrivalId:'f20', eventIdDom:'f21', lead:50},
+  stars_parade_2026_10_10:     {arrivalId:'s3',  eventIdDom:'s4',  lead:35},
+  lion_king_2026_10_10:        {arrivalId:'s6',  eventIdDom:'s7',  lead:30},
+  halloween_2026_10_10:        {arrivalId:'s8',  eventIdDom:'s9',  lead:40},
+  tales_magic_2026_10_10:      {arrivalId:'s14', eventIdDom:'s15', lead:60},
+  halloween_2026_10_11:        {arrivalId:'d6',  eventIdDom:'d7',  lead:30}
+};
 
 function configured(){
   return SUPABASE_URL.startsWith('https://') &&
@@ -397,6 +482,177 @@ function applyRemoteRow(row){
   }
 }
 
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function shiftHHMM(hhmm, deltaMinutes){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '').trim());
+  if(!m) return null;
+  let total = Number(m[1]) * 60 + Number(m[2]) + deltaMinutes;
+  total = ((total % 1440) + 1440) % 1440;
+  const h = Math.floor(total / 60);
+  const min = total % 60;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+
+function clearScheduleDecorations(){
+  Object.values(scheduleMap).forEach(cfg => {
+    [cfg.arrivalId, cfg.eventIdDom].forEach(inputId => {
+      const input = document.getElementById(inputId);
+      const item = input?.closest('.item');
+      if(!item) return;
+      item.classList.remove('schedule-changed');
+      item.querySelectorAll('.alert-badge,.inline-schedule-alert,.new-arrival-time')
+        .forEach(el => el.remove());
+    });
+  });
+}
+
+function isScheduleAlert(row){
+  if(!row) return false;
+  if(row.status && row.status !== 'ok') return true;
+  if(row.planned_time && row.live_time && row.planned_time !== row.live_time) return true;
+  return false;
+}
+
+function decorateScheduleRow(row){
+  const cfg = scheduleMap[row.event_id];
+  if(!cfg || !isScheduleAlert(row)) return;
+
+  const eventInput = document.getElementById(cfg.eventIdDom);
+  const arrivalInput = document.getElementById(cfg.arrivalId);
+  const eventItem = eventInput?.closest('.item');
+  const arrivalItem = arrivalInput?.closest('.item');
+
+  const symbol = row.status === 'unknown' ? '⚠' : '!';
+  const cls = row.status === 'unknown' ? ' unknown' : '';
+
+  if(eventItem){
+    eventItem.classList.add('schedule-changed');
+    const strong = eventItem.querySelector('strong');
+    if(strong && !strong.querySelector('.alert-badge')){
+      const badge = document.createElement('span');
+      badge.className = 'alert-badge';
+      badge.textContent = symbol;
+      badge.title = 'Cambio de horario detectado';
+      strong.appendChild(badge);
+    }
+
+    const info = document.createElement('span');
+    info.className = 'inline-schedule-alert' + cls;
+
+    if(row.status === 'cancelled'){
+      info.textContent = `CANCELADO · horario previsto ${row.planned_time || '—'}`;
+    } else if(row.status === 'unknown'){
+      info.textContent = row.message || 'Horario pendiente de confirmar. Revisa la app oficial.';
+    } else {
+      info.textContent =
+        `CAMBIO: ${row.planned_time || '—'} → ${row.live_time || '—'}`
+        + (row.message ? ` · ${row.message}` : '');
+    }
+    eventItem.querySelector('.checkrow label')?.appendChild(info);
+  }
+
+  if(arrivalItem){
+    arrivalItem.classList.add('schedule-changed');
+    if(row.status !== 'cancelled' && row.live_time){
+      const recommended = shiftHHMM(row.live_time, -cfg.lead);
+      if(recommended){
+        const info = document.createElement('span');
+        info.className = 'new-arrival-time';
+        info.textContent = `❗ NUEVA HORA RECOMENDADA PARA ESTAR AQUÍ: ${recommended}`;
+        arrivalItem.querySelector('.checkrow label')?.appendChild(info);
+      }
+    } else if(row.status === 'cancelled'){
+      const info = document.createElement('span');
+      info.className = 'new-arrival-time';
+      info.textContent = '❗ Evento cancelado: este bloque ya no necesita espera.';
+      arrivalItem.querySelector('.checkrow label')?.appendChild(info);
+    }
+  }
+}
+
+function renderScheduleAlerts(rows){
+  clearScheduleDecorations();
+
+  const panel = document.getElementById('scheduleAlertPanel');
+  const list = document.getElementById('scheduleAlertList');
+  const okLine = document.getElementById('scheduleOkLine');
+  const alerts = (rows || []).filter(isScheduleAlert);
+
+  list.innerHTML = '';
+
+  if(alerts.length === 0){
+    panel.classList.remove('active');
+    okLine.style.display = 'flex';
+    okLine.textContent = '✅ Sin cambios de horario detectados en Supabase.';
+    return;
+  }
+
+  okLine.style.display = 'none';
+  panel.classList.add('active');
+
+  alerts
+    .sort((a,b) => String(a.event_date).localeCompare(String(b.event_date)))
+    .forEach(row => {
+      decorateScheduleRow(row);
+
+      const card = document.createElement('div');
+      card.className = `schedule-alert-card ${row.status || ''}`;
+
+      let detail = '';
+      if(row.status === 'cancelled'){
+        detail = `Previsto: ${escapeHtml(row.planned_time || '—')} · CANCELADO`;
+      } else if(row.status === 'unknown'){
+        detail = escapeHtml(row.message || 'Horario pendiente de confirmar.');
+      } else {
+        detail = `Previsto: ${escapeHtml(row.planned_time || '—')} → Nuevo: <b>${escapeHtml(row.live_time || '—')}</b>`;
+      }
+
+      const cfg = scheduleMap[row.event_id];
+      const arrival = (row.live_time && cfg && row.status !== 'cancelled')
+        ? shiftHHMM(row.live_time, -cfg.lead)
+        : null;
+
+      card.innerHTML = `
+        <b>❗ ${escapeHtml(row.event_name)}</b>
+        <div class="schedule-alert-meta">
+          ${escapeHtml(row.event_date)} · ${detail}
+          ${arrival ? `<br>Recomendación: <b>estar allí a las ${escapeHtml(arrival)}</b>` : ''}
+          ${row.message && row.status !== 'unknown' ? `<br>${escapeHtml(row.message)}` : ''}
+        </div>
+        ${row.source_url ? `<div class="schedule-alert-source"><a href="${escapeHtml(row.source_url)}" target="_blank" rel="noopener">Ver fuente</a></div>` : ''}
+      `;
+      list.appendChild(card);
+    });
+}
+
+async function loadScheduleAlerts(){
+  if(!sb) return;
+  const { data, error } = await sb
+    .from('disney_schedule_alerts')
+    .select('event_id,event_name,event_date,planned_time,live_time,status,message,source_url,updated_at')
+    .eq('trip_id', TRIP_ID)
+    .order('event_date', { ascending: true });
+
+  if(error){
+    console.error('Error cargando alertas de horario:', error);
+    const okLine = document.getElementById('scheduleOkLine');
+    okLine.style.display = 'flex';
+    okLine.textContent = '⚠️ No se pudieron comprobar los avisos de horarios.';
+    return;
+  }
+
+  renderScheduleAlerts(data || []);
+}
+
 async function saveRemote(box){
   if(!sb) return;
   const who = personName.value.trim() || 'Dispositivo';
@@ -455,6 +711,7 @@ async function initSupabase(){
   try{
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     await reloadFromCloud();
+    await loadScheduleAlerts();
 
     realtimeChannel = sb
       .channel('disneyland-buenogal-2026-live')
@@ -476,6 +733,20 @@ async function initSupabase(){
         else if(status === 'TIMED_OUT') setStatus('bad', 'Realtime sin respuesta');
       });
 
+    scheduleChannel = sb
+      .channel('disneyland-buenogal-2026-schedule-alerts')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'disney_schedule_alerts',
+          filter: `trip_id=eq.${TRIP_ID}`
+        },
+        () => loadScheduleAlerts()
+      )
+      .subscribe();
+
   } catch(err){
     console.error(err);
     setStatus('bad', 'No se pudo iniciar Supabase');
@@ -492,7 +763,10 @@ boxes.forEach(box => {
 });
 
 window.addEventListener('online', () => {
-  if(sb) reloadFromCloud();
+  if(sb){
+    reloadFromCloud();
+    loadScheduleAlerts();
+  }
 });
 window.addEventListener('offline', () => {
   setStatus('warn', 'Sin internet · cambios guardados localmente');

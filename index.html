@@ -221,7 +221,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
       <span class="badge">Embarazo</span>
       <span class="badge">Sin Extra Magic Time</span>
       <span class="badge">Checklist compartida</span>
-      <span class="badge"><b>Versión:</b> v3.2</span>
+      <span class="badge"><b>Versión:</b> v3.3</span>
     </div>
   </div>
 </header>
@@ -233,7 +233,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
   </div>
   <div class="wrap statusmeta">
-    <span>🧩 <b>v3.1</b></span>
+    <span>🧩 <b>v3.3</b></span>
     <span>🔄 Última sincronización: <b id="lastSyncAt">—</b></span>
     <span>🕒 Última comprobación de horarios: <b id="lastScheduleCheckAt">—</b></span>
   </div>
@@ -674,13 +674,30 @@ function decorateScheduleRow(row){
   }
 }
 
+const confirmedScheduleChanges = [
+  {
+    event_id: 'lion_king_2026_10_10',
+    event_name: 'The Lion King: Rhythms of the Pride Lands',
+    event_date: '2026-10-10',
+    planned_time: '13:30',
+    live_time: '13:10',
+    status: 'changed',
+    message: 'Cambio de horario confirmado. El planning ya está actualizado a las 13:10.',
+    source_url: null,
+    confirmed_change: true
+  }
+];
+
 function renderScheduleAlerts(rows){
   clearScheduleDecorations();
 
   const panel = document.getElementById('scheduleAlertPanel');
   const list = document.getElementById('scheduleAlertList');
   const okLine = document.getElementById('scheduleOkLine');
-  const alerts = (rows || []).filter(isScheduleAlert);
+  const automaticAlerts = (rows || []).filter(isScheduleAlert);
+  const automaticIds = new Set(automaticAlerts.map(r => r.event_id));
+  const confirmedAlerts = confirmedScheduleChanges.filter(r => !automaticIds.has(r.event_id));
+  const alerts = [...automaticAlerts, ...confirmedAlerts];
 
   list.innerHTML = '';
 

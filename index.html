@@ -221,7 +221,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
       <span class="badge">Embarazo</span>
       <span class="badge">Sin Extra Magic Time</span>
       <span class="badge">Checklist compartida</span>
-      <span class="badge"><b>Versión:</b> v3.4</span>
+      <span class="badge"><b>Versión:</b> v3.5</span>
     </div>
   </div>
 </header>
@@ -233,7 +233,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
   </div>
   <div class="wrap statusmeta">
-    <span>🧩 <b>v3.4</b></span>
+    <span>🧩 <b>v3.5</b></span>
     <span>🔄 Última sincronización: <b id="lastSyncAt">—</b></span>
     <span>🕒 Última comprobación de horarios: <b id="lastScheduleCheckAt">—</b></span>
   </div>
@@ -250,6 +250,11 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     </div>
   </div>
   <div id="scheduleAlertList" class="schedule-alert-list"></div>
+</section>
+<section id="manualSchedulePanel" class="card" style="display:none;border:1px solid #eab308;background:#fffbeb">
+ <h3 style="margin:0 0 8px">🟡 Comprobación manual pendiente</h3>
+ <div class="small">Si la comprobación automática sigue sin confirmar un pase, consulta la app oficial Disney el mismo día y marca el resultado.</div>
+ <div id="manualScheduleList"></div>
 </section>
 
 <section class="card">
@@ -688,13 +693,52 @@ const confirmedScheduleChanges = [
   }
 ];
 
+const manualScheduleKey = 'disney_manual_schedule_v35';
+function manualScheduleState(){try{return JSON.parse(localStorage.getItem(manualScheduleKey)||'{}')}catch{return {}}}
+function storeManualSchedule(id,value){
+ const state=manualScheduleState();state[id]={...value,verified_at:new Date().toISOString()};
+ localStorage.setItem(manualScheduleKey,JSON.stringify(state));
+}
+function renderManualSchedule(rows){
+ const panel=document.getElementById('manualSchedulePanel'),list=document.getElementById('manualScheduleList');
+ if(!panel||!list)return;
+ const state=manualScheduleState();
+ const pending=(rows||[]).filter(r=>r.status==='unknown'&&scheduleMap[r.event_id]);
+ panel.style.display=pending.length?'block':'none';list.replaceChildren();
+ pending.forEach(r=>{
+  const saved=state[r.event_id],today=new Date().toLocaleDateString('en-CA');
+  const valid=saved&&saved.verified_at.slice(0,10)===today;
+  const box=document.createElement('div');box.style.cssText='padding:10px 0;border-bottom:1px solid #e5e7eb';
+  const title=document.createElement('b');title.textContent=r.event_name+' · '+r.event_date+' · '+(r.planned_time||'—');box.append(title);
+  const status=document.createElement('div');status.className='small';
+  status.textContent=valid?(saved.result==='ok'?'🟢 Comprobado en app oficial: sin cambios': '🔴 Cambio indicado manualmente: '+saved.new_time):'🟡 Pendiente de comprobar en app oficial el día del espectáculo';
+  box.append(status);
+  const green=document.createElement('button');green.type='button';green.textContent='✓ Sigue el plan';green.style.cssText='margin:8px 6px 0 0;padding:8px;border-radius:8px;background:#dcfce7;border:1px solid #16a34a';
+  green.onclick=()=>{storeManualSchedule(r.event_id,{result:'ok'});renderManualSchedule(rows)};
+  const red=document.createElement('button');red.type='button';red.textContent='⚠ Ha cambiado';red.style.cssText='padding:8px;border-radius:8px;background:#fee2e2;border:1px solid #dc2626';
+  red.onclick=()=>{
+   const value=prompt('Nueva hora oficial (HH:MM):');
+   if(!value)return;
+   if(!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value)){alert('Introduce HH:MM');return}
+   storeManualSchedule(r.event_id,{result:'changed',new_time:value});
+   renderManualSchedule(rows);
+  };
+  box.append(green,red);
+  if(valid&&saved.result==='changed'){
+   const cfg=scheduleMap[r.event_id],note=document.createElement('div');note.className='small';
+   note.textContent='Nueva llegada recomendada: '+shiftHHMM(saved.new_time,-cfg.lead)+'. Pendiente de aplicar al planning compartido.';box.append(note);
+  }
+  list.append(box);
+ });
+}
 function renderScheduleAlerts(rows){
   clearScheduleDecorations();
 
   const panel = document.getElementById('scheduleAlertPanel');
   const list = document.getElementById('scheduleAlertList');
   const okLine = document.getElementById('scheduleOkLine');
-  const automaticAlerts = (rows || []).filter(isScheduleAlert);
+  renderManualSchedule(rows);
+  const automaticAlerts = (rows || []).filter(r=>r.status!=='unknown'&&isScheduleAlert(r));
   const automaticIds = new Set(automaticAlerts.map(r => r.event_id));
   const confirmedAlerts = confirmedScheduleChanges.filter(r => !automaticIds.has(r.event_id));
   const alerts = [...automaticAlerts, ...confirmedAlerts];

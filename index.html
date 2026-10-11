@@ -25,9 +25,8 @@ body{
 header{
   position:relative;overflow:hidden;color:white;padding:34px 18px 30px;
   background:
-    radial-gradient(circle at 18% 18%,rgba(255,210,125,.22),transparent 24%),
-    radial-gradient(circle at 92% 70%,rgba(236,72,153,.52),transparent 34%),
-    linear-gradient(135deg,#071f73 0%,#2636b9 42%,#7138d1 72%,#ec4899 120%);
+    linear-gradient(90deg,rgba(3,15,62,.18) 0%,rgba(4,18,68,.20) 36%,rgba(8,20,70,.58) 62%,rgba(15,19,64,.72) 100%),
+    url("./file_0000000048d082438f4322d196771520.png?v=42") center center / cover no-repeat;
 }
 header:after{
   content:"";position:absolute;inset:auto -8% -46% 28%;height:75%;
@@ -36,7 +35,7 @@ header:after{
 }
 .wrap{max-width:1050px;margin:auto;padding:0 15px}
 .hero-brand{position:relative;z-index:1;display:grid;grid-template-columns:minmax(180px,31%) 1fr;align-items:center;gap:26px}
-.hero-logo{width:100%;max-width:270px;aspect-ratio:1;object-fit:contain;justify-self:center;filter:drop-shadow(0 12px 20px rgba(0,0,40,.38))}
+.hero-logo{display:none}
 .hero-copy{min-width:0}
 h1{margin:0 0 12px;font-size:clamp(32px,5vw,54px);line-height:.98;letter-spacing:-.02em;text-shadow:0 2px 12px rgba(0,0,50,.18)}
 .subtitle{opacity:.98;font-size:clamp(15px,2vw,19px)}
@@ -237,7 +236,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
 <header>
   <div class="wrap">
     <div class="hero-brand">
-      <img class="hero-logo" src="./buenogal-logo.svg?v=41" alt="Emblema BuenoGal">
+      <div class="hero-logo" aria-hidden="true"></div>
       <div class="hero-copy">
         <h1>DISNEYLAND BUENOGAL 2026</h1>
         <div class="subtitle">9–11 octubre · Planning familiar sincronizado en tiempo real</div>
@@ -247,7 +246,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
           <span class="badge">Embarazo</span>
           <span class="badge">Sin Extra Magic Time</span>
           <span class="badge">Checklist compartida</span>
-          <span class="badge"><b>Versión:</b> v4.1</span>
+          <span class="badge"><b>Versión:</b> v4.2</span>
         </div>
       </div>
     </div>
@@ -261,7 +260,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
   </div>
   <div class="wrap statusmeta">
-    <span>🧩 <b>v4.1</b></span>
+    <span>🧩 <b>v4.2</b></span>
     <span>🔄 Última sincronización: <b id="lastSyncAt">—</b></span>
     <span>🕒 Última comprobación de horarios: <b id="lastScheduleCheckAt">—</b></span>
   </div>

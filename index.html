@@ -221,7 +221,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
       <span class="badge">Embarazo</span>
       <span class="badge">Sin Extra Magic Time</span>
       <span class="badge">Checklist compartida</span>
-      <span class="badge"><b>Versión:</b> v3.5</span>
+      <span class="badge"><b>Versión:</b> v3.6</span>
     </div>
   </div>
 </header>
@@ -233,7 +233,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
     <input id="personName" class="namebox" maxlength="20" placeholder="Tu nombre (ej. Nacho / Patri)">
   </div>
   <div class="wrap statusmeta">
-    <span>🧩 <b>v3.5</b></span>
+    <span>🧩 <b>v3.6</b></span>
     <span>🔄 Última sincronización: <b id="lastSyncAt">—</b></span>
     <span>🕒 Última comprobación de horarios: <b id="lastScheduleCheckAt">—</b></span>
   </div>
@@ -367,25 +367,26 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
 <section class="card day-sun">
 <h2>Domingo 11 · Ruta optimizada hasta las 18:00</h2>
 <div class="sectionProgress" id="sunSectionProgress"></div>
-<div class="warning"><b>Prioridades fijas de hoy:</b> Princess Pavilion ≈10:28 y Lilo & Stitch 13:45. El resto se adapta alrededor de esas dos citas. El pase de embarazada agiliza accesos cuando corresponda, pero no elimina restricciones de seguridad.</div>
+<div class="warning"><b>Versión de ruta 11/10:</b> Princesas ≈10:28 y Lilo & Stitch 13:45 son citas fijas. Aprovechad posibles colas menores durante el desfile de Halloween; no está garantizado. Castillo y Dragón pasan a la tarde. City Hall es parada obligatoria antes de salir. El pase de embarazada no elimina restricciones de seguridad.</div>
 <div class="timeline">
-<div class="item"><div class="time">HECHO</div><div class="checkrow"><input data-group="sun" id="sun26autopia" type="checkbox" checked><label for="sun26autopia"><strong>Autopia ✅</strong><span class="small">Ya realizada aprovechando un hueco.</span></label></div></div>
-<div class="item"><div class="time">Ahora</div><div class="checkrow"><input data-group="sun" id="sun26princessgo" type="checkbox"><label for="sun26princessgo"><strong>Ir a Princess Pavilion</strong><span class="small">No meter nada antes: la cita es en unos 15 minutos.</span></label></div></div>
-<div class="item"><div class="time">≈10:28</div><div class="checkrow"><input data-group="sun" id="sun26princess" type="checkbox"><label for="sun26princess"><strong>Princess Pavilion · encuentro con princesa 👑</strong><span class="small">Cita conseguida. Esta hora manda sobre el resto de la mañana.</span></label></div></div>
-<div class="item"><div class="time">10:50–11:15</div><div class="checkrow"><input data-group="sun" id="sun26castle" type="checkbox"><label for="sun26castle"><strong>Le Château de la Belle au Bois Dormant</strong><span class="small">Muy cerca de Princess Pavilion.</span></label></div></div>
-<div class="item"><div class="time">11:15–11:30</div><div class="checkrow"><input data-group="sun" id="sun26dragon" type="checkbox"><label for="sun26dragon"><strong>La Tanière du Dragon</strong><span class="small">Separada para poder marcarla individualmente.</span></label></div></div>
-<div class="item"><div class="time">11:30–12:00</div><div class="checkrow"><input data-group="sun" id="sun26train" type="checkbox"><label for="sun26train"><strong>Disneyland Railroad · Fantasyland Station</strong><span class="small">Solo si la espera encaja; si se alarga, dejar para el bloque flexible.</span></label></div></div>
-<div class="item"><div class="time">12:00–12:40</div><div class="checkrow"><input data-group="sun" id="d3" type="checkbox"><label for="d3"><strong>Comer en Toad Hall Restaurant ⭐</strong><span class="small">Comida antes de la cita de Stitch para no llegar apurados.</span></label></div></div>
-<div class="item"><div class="time">12:40–13:20</div><div class="checkrow"><input data-group="sun" id="sun26aladdin" type="checkbox"><label for="sun26aladdin"><strong>Le Passage Enchanté d'Aladdin</strong><span class="small">Hacerlo solo si deja margen cómodo para ir al encuentro de Stitch.</span></label></div></div>
-<div class="item"><div class="time">13:20</div><div class="checkrow"><input data-group="sun" id="sun26stitchgo" type="checkbox"><label for="sun26stitchgo"><strong>Ir al encuentro de Lilo & Stitch</strong><span class="small">Dejar margen para estar allí antes de la cita.</span></label></div></div>
-<div class="item"><div class="time">13:45</div><div class="checkrow"><input data-group="sun" id="sun26stitch" type="checkbox"><label for="sun26stitch"><strong>Lilo & Stitch 🌺</strong><span class="small">Cita confirmada.</span></label></div></div>
-<div class="item"><div class="time">14:10–14:45</div><div class="checkrow"><input data-group="sun" id="sun26pirates" type="checkbox"><label for="sun26pirates"><strong>Pirates of the Caribbean</strong><span class="small">Adventureland; continuar por la misma zona.</span></label></div></div>
-<div class="item"><div class="time">14:45–15:15</div><div class="checkrow"><input data-group="sun" id="sun26indiana" type="checkbox"><label for="sun26indiana"><strong>Indiana Jones et le Temple du Péril</strong><span class="small">Solo pasajeros que cumplan restricciones; embarazadas no.</span></label></div></div>
-<div class="item"><div class="time">15:15–15:50</div><div class="checkrow"><input data-group="sun" id="sun26thunder" type="checkbox"><label for="sun26thunder"><strong>Big Thunder Mountain</strong><span class="small">Frontierland; embarazadas no. Turnarse si procede.</span></label></div></div>
-<div class="item"><div class="time">15:50–16:15</div><div class="checkrow"><input data-group="sun" id="sun26orbitron" type="checkbox"><label for="sun26orbitron"><strong>Orbitron</strong><span class="small">Check independiente.</span></label></div></div>
-<div class="item"><div class="time">16:15–16:35</div><div class="checkrow"><input data-group="sun" id="sun26nautilus" type="checkbox"><label for="sun26nautilus"><strong>Les Mystères du Nautilus</strong><span class="small">Check independiente.</span></label></div></div>
-<div class="item"><div class="time">16:35–17:20</div><div class="checkrow"><input data-group="sun" id="sun26buffer" type="checkbox"><label for="sun26buffer"><strong>Margen para pendientes</strong><span class="small">Recuperar Railroad, Aladdín u otro punto que se haya caído por colas o citas.</span></label></div></div>
-<div class="item"><div class="time">17:20–18:00</div><div class="checkrow"><input data-group="sun" id="sun26exit" type="checkbox"><label for="sun26exit"><strong>Baños, recogida y salida del parque</strong><span class="small">Salir del parque como máximo a las 18:00.</span></label></div></div>
+<div class="item"><div class="time">HECHO</div><div class="checkrow"><input data-group="sun" id="sun26autopia" type="checkbox" checked><label for="sun26autopia"><strong>Autopia ✅</strong><span class="small">Ya realizada; conservar su check individual.</span></label></div></div>
+<div class="item"><div class="time">Ahora</div><div class="checkrow"><input data-group="sun" id="sun26princessgo" type="checkbox"><label for="sun26princessgo"><strong>Ir a Princess Pavilion</strong><span class="small">Prioridad: cita de princesas conseguida.</span></label></div></div>
+<div class="item"><div class="time">≈10:28</div><div class="checkrow"><input data-group="sun" id="sun26princess" type="checkbox"><label for="sun26princess"><strong>Princess Pavilion · encuentro con princesa 👑</strong><span class="small">Cita confirmada; respetar la hora real indicada por Disney.</span></label></div></div>
+<div class="item"><div class="time">10:50–11:15</div><div class="checkrow"><input data-group="sun" id="sun26train" type="checkbox"><label for="sun26train"><strong>Disneyland Railroad · Fantasyland Station</strong><span class="small">Aprovechar si la cola es corta; si no, pasar al siguiente punto.</span></label></div></div>
+<div class="item"><div class="time">11:30–12:15</div><div class="checkrow"><input data-group="sun" id="d3" type="checkbox"><label for="d3"><strong>Comer en Toad Hall Restaurant ⭐</strong><span class="small">Comida en Fantasyland, con margen antes de Stitch.</span></label></div></div>
+<div class="item"><div class="time">12:15–12:40</div><div class="checkrow"><input data-group="sun" id="sun26aladdin" type="checkbox"><label for="sun26aladdin"><strong>Le Passage Enchanté d'Aladdin</strong><span class="small">Camino de Adventureland; visita breve.</span></label></div></div>
+<div class="item"><div class="time">12:40–13:10</div><div class="checkrow"><input data-group="sun" id="sun26pirates" type="checkbox"><label for="sun26pirates"><strong>Pirates of the Caribbean</strong><span class="small">Priorizar si la espera permite llegar puntuales a Stitch.</span></label></div></div>
+<div class="item"><div class="time">13:15</div><div class="checkrow"><input data-group="sun" id="sun26stitchgo" type="checkbox"><label for="sun26stitchgo"><strong>Ir al encuentro de Lilo & Stitch</strong><span class="small">Traslado a la ubicación que indique la reserva; si queda lejos, salir antes y posponer Pirates.</span></label></div></div>
+<div class="item"><div class="time">13:45</div><div class="checkrow"><input data-group="sun" id="sun26stitch" type="checkbox"><label for="sun26stitch"><strong>Lilo & Stitch 🌺</strong><span class="small">Cita confirmada, no mover.</span></label></div></div>
+<div class="item"><div class="time">14:10–14:40</div><div class="checkrow"><input data-group="sun" id="sun26indiana" type="checkbox"><label for="sun26indiana"><strong>Indiana Jones et le Temple du Péril</strong><span class="small">Solo quienes cumplan las restricciones; no apta para embarazadas.</span></label></div></div>
+<div class="item"><div class="time">14:40–15:20</div><div class="checkrow"><input data-group="sun" id="sun26thunder" type="checkbox"><label for="sun26thunder"><strong>Big Thunder Mountain</strong><span class="small">Frontierland; no apta para embarazadas. Si hay mucha cola, usar el bloque flexible.</span></label></div></div>
+<div class="item"><div class="time">15:20–15:50</div><div class="checkrow"><input data-group="sun" id="sun26orbitron" type="checkbox"><label for="sun26orbitron"><strong>Orbitron</strong><span class="small">Discoveryland; check independiente. Verificar restricciones de embarazo.</span></label></div></div>
+<div class="item"><div class="time">15:50–16:10</div><div class="checkrow"><input data-group="sun" id="sun26nautilus" type="checkbox"><label for="sun26nautilus"><strong>Les Mystères du Nautilus</strong><span class="small">Discoveryland; check independiente.</span></label></div></div>
+<div class="item"><div class="time">16:10–16:35</div><div class="checkrow"><input data-group="sun" id="sun26castle" type="checkbox"><label for="sun26castle"><strong>Le Château de la Belle au Bois Dormant</strong><span class="small">Se retrasa para priorizar atracciones durante el desfile.</span></label></div></div>
+<div class="item"><div class="time">16:35–16:50</div><div class="checkrow"><input data-group="sun" id="sun26dragon" type="checkbox"><label for="sun26dragon"><strong>La Tanière du Dragon</strong><span class="small">Junto al castillo; check independiente.</span></label></div></div>
+<div class="item"><div class="time">16:50–17:20</div><div class="checkrow"><input data-group="sun" id="sun26buffer" type="checkbox"><label for="sun26buffer"><strong>Margen para pendientes</strong><span class="small">Recuperar Railroad, Pirates u otra visita; no sacrificar City Hall.</span></label></div></div>
+<div class="item"><div class="time">17:20–17:40</div><div class="checkrow"><input data-group="sun" id="sun26cityhall" type="checkbox"><label for="sun26cityhall"><strong>City Hall · chapa de primera visita 🎖️</strong><span class="small">En Town Square, cerca de la salida. Solicitar insignia gratuita, sujeta a disponibilidad.</span></label></div></div>
+<div class="item"><div class="time">17:40–18:00</div><div class="checkrow"><input data-group="sun" id="sun26exit" type="checkbox"><label for="sun26exit"><strong>Baños y salida del parque</strong><span class="small">Salir del parque como máximo a las 18:00.</span></label></div></div>
 </div>
 </section>
 <section class="card">

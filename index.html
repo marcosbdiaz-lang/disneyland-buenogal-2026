@@ -266,7 +266,7 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
   <div class="grid" style="margin-top:12px">
     <div class="kpi"><b id="friProgress">0%</b>Viernes · Adventure World</div>
     <div class="kpi"><b id="satProgress">0%</b>Sábado · Disneyland Park</div>
-    <div class="kpi"><b id="sunProgress">0%</b>Domingo · día colchón</div>
+    <div class="kpi"><b id="sunProgress">0%</b>Domingo · ruta hasta las 18:00</div>
     <div class="kpi"><b id="prepProgress">0%</b>Preparación / reglas</div>
   </div>
   <div id="lastChange" class="lastchange">Todavía no hay cambios sincronizados.</div>
@@ -365,21 +365,23 @@ code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
 </section>
 
 <section class="card day-sun">
-  <h2>Domingo 11 · Día colchón</h2>
-  <div class="sectionProgress" id="sunSectionProgress"></div>
-  <div class="success"><b>Objetivo:</b> recuperar pendientes, repetir favoritos y no forzar un tercer maratón.</div>
-  <div class="timeline">
-    <div class="item"><div class="time">08:30</div><div class="checkrow"><input data-group="sun" id="d1" type="checkbox"><label for="d1"><strong>Llegar al parque</strong></label></div></div>
-    <div class="item"><div class="time">09:00–11:15</div><div class="checkrow"><input data-group="sun" id="d2" type="checkbox"><label for="d2"><strong>Favoritos + personaje pendiente</strong></label></div></div>
-    <div class="item"><div class="time">11:30–12:10</div><div class="checkrow"><input data-group="sun" id="d3" type="checkbox"><label for="d3"><strong>Pizzeria Bella Notte ⭐</strong></label></div></div>
-    <div class="item"><div class="time">12:15–14:30</div><div class="checkrow"><input data-group="sun" id="d4" type="checkbox"><label for="d4"><strong>Fantasyland / Adventureland / personajes</strong></label></div></div>
-    <div class="item"><div class="time">14:30–16:00</div><div class="checkrow"><input data-group="sun" id="d5" type="checkbox"><label for="d5"><strong>Siesta / descanso protegido</strong></label></div></div>
-    <div class="item"><div class="time">16:30</div><div class="checkrow"><input data-group="sun" id="d6" type="checkbox"><label for="d6"><strong>PLAN B · estar para Halloween</strong><span class="small">Solo si hace falta recuperar/repetir.</span></label></div></div>
-    <div class="item"><div class="time">17:00</div><div class="checkrow"><input data-group="sun" id="d7" type="checkbox"><label for="d7"><strong>Mickey's Halloween Celebration · Plan B</strong></label></div></div>
-    <div class="item"><div class="time">17:30+</div><div class="checkrow"><input data-group="sun" id="d8" type="checkbox"><label for="d8"><strong>Favoritos / compras / fotos</strong></label></div></div>
-  </div>
+<h2>Domingo 11 · Ruta optimizada hasta las 18:00</h2>
+<div class="sectionProgress" id="sunSectionProgress"></div>
+<div class="warning"><b>Prioridad:</b> reservar Princess Pavilion al entrar; su hora asignada manda. Horarios de ruta orientativos, sujetos a colas y aperturas. El pase de embarazada no elimina restricciones de seguridad.</div>
+<div class="timeline">
+<div class="item"><div class="time">09:00</div><div class="checkrow"><input data-group="sun" id="d1" type="checkbox"><label for="d1"><strong>Entrada y solicitar turno de Princess Pavilion</strong><span class="small">Reservar cola virtual en app tras escanear entradas; el turno asignado tiene prioridad.</span></label></div></div>
+<div class="item"><div class="time">09:15–10:00</div><div class="checkrow"><input data-group="sun" id="sun26castle" type="checkbox"><label for="sun26castle"><strong>Castillo de la Bella Durmiente + La Tanière du Dragon</strong><span class="small">Ambos juntos, en Fantasyland.</span></label></div></div>
+<div class="item"><div class="time">10:00–10:40</div><div class="checkrow"><input data-group="sun" id="sun26train" type="checkbox"><label for="sun26train"><strong>Disneyland Railroad · Fantasyland Station</strong><span class="small">Solo si está operativa y la espera encaja.</span></label></div></div>
+<div class="item"><div class="time">Según reserva</div><div class="checkrow"><input data-group="sun" id="sun26princess" type="checkbox"><label for="sun26princess"><strong>Princess Pavilion · encuentro con princesa</strong><span class="small">Volver a Fantasyland a la hora asignada.</span></label></div></div>
+<div class="item"><div class="time">10:40–11:35</div><div class="checkrow"><input data-group="sun" id="sun26adventure" type="checkbox"><label for="sun26adventure"><strong>Le Passage Enchanté d'Aladdin + Pirates of the Caribbean</strong><span class="small">Adventureland, recorrido a pie.</span></label></div></div>
+<div class="item"><div class="time">11:35–12:10</div><div class="checkrow"><input data-group="sun" id="sun26indiana" type="checkbox"><label for="sun26indiana"><strong>Indiana Jones et le Temple du Péril</strong><span class="small">Solo pasajeros que cumplan restricciones; embarazadas no.</span></label></div></div>
+<div class="item"><div class="time">12:10–12:55</div><div class="checkrow"><input data-group="sun" id="d3" type="checkbox"><label for="d3"><strong>Comida y descanso</strong><span class="small">Parada flexible.</span></label></div></div>
+<div class="item"><div class="time">12:55–13:50</div><div class="checkrow"><input data-group="sun" id="sun26thunder" type="checkbox"><label for="sun26thunder"><strong>Big Thunder Mountain</strong><span class="small">Frontierland; embarazadas no. Turnarse si procede.</span></label></div></div>
+<div class="item"><div class="time">13:50–15:30</div><div class="checkrow"><input data-group="sun" id="sun26discovery" type="checkbox"><label for="sun26discovery"><strong>Orbitron → Les Mystères du Nautilus → Autopia</strong><span class="small">Discoveryland; consultar restricciones y operatividad.</span></label></div></div>
+<div class="item"><div class="time">15:30–17:15</div><div class="checkrow"><input data-group="sun" id="sun26buffer" type="checkbox"><label for="sun26buffer"><strong>Margen para princesas y pendientes</strong><span class="small">Reordenar según turno de Princess Pavilion y colas.</span></label></div></div>
+<div class="item"><div class="time">17:15–18:00</div><div class="checkrow"><input data-group="sun" id="sun26exit" type="checkbox"><label for="sun26exit"><strong>Baños, recogida y salida del parque</strong><span class="small">Salir del parque como máximo a las 18:00.</span></label></div></div>
+</div>
 </section>
-
 <section class="card">
   <h2>Restaurantes objetivo</h2>
   <table>
